@@ -1,58 +1,41 @@
-#define SDL_MAIN_HANDLED
-
-#include <iostream>
-#include <stdio.h>
+#define GLFW_INCLUDE_VULKAN
+// with GLFW_INCLUDE_VULKAN defined this will load vulkan.h with glfw
+#include <GLFW/glfw3.h>
 
 #include "glm/glm.hpp"
-#include <SDL.h>
-#include "Window.hpp"
 
-#ifdef __APPLE__
-#include <OpenGL/gl3.h>
-#else // !__APPLE__
-#ifdef _WIN32
-#include <Windows.h>
-#endif // _WIN32
-#ifndef _GL_H
-#include <GL/glew.h>
-#endif // _GL_H
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif // __APPLE__
+#include <iostream>
 
 int main(int argcv, char ** argc) {
-    Window window = Window();
-    window.create("test", 700, 600, SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
-    bool loop = true;
+    // initialize the GLFW libary
+    glfwInit();
+    // Because GLFW was originally designed to create an OpenGL context, we need to tell it to not create an OpenGL context with this hint
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    // resizing windows takes special care so we'll disable it for now
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    
+    // create the window. 4th param is optional to specify which monitor to open the window on. 5th param is only relevant to opengl
+    GLFWwindow* window = glfwCreateWindow(800, 600, "Vulkan Window", nullptr, nullptr);
+    
+    uint32_t extensionCount = 0;
+    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
 
-    while(loop) {
-        
-        SDL_Event event;
-        
-        while(SDL_PollEvent(&event)) {
-            
-            switch(event.key.keysym.sym) {
-                case SDLK_ESCAPE:
-                    loop = false;
-                    break;
-                case SDLK_r:
-                    glClearColor(1.0f, 0.0f, 0.0f, 1);
-                    glClear(GL_COLOR_BUFFER_BIT);
-                    window.swapWindow();
-                    break;
-                case SDLK_g:
-                    glClearColor(0.0f, 1.0f, 0.0f, 1);
-                    glClear(GL_COLOR_BUFFER_BIT);
-                    window.swapWindow();
-                    break;
-                case SDLK_b:
-                    glClearColor(0.0f, 0.0f, 1.0f, 1);
-                    glClear(GL_COLOR_BUFFER_BIT);
-                    window.swapWindow();
-                    break;
-                default:
-                    break;
-            }
-        }
+    std::cout << " extensions supported" << std::endl;
+    
+    // simple test to see if glm library is available 
+    glm::mat4 matrix;
+    glm::vec4 vec;
+    auto test = matrix * vec;
+    
+    // loops and checks weather the exit button has been pressed
+    while(!glfwWindowShouldClose(window)) {
+        // processes all events currently in the event queue. Calls associated handlers
+        glfwPollEvents();
     }
+    
+    // Destroys the specified window and its context
+    glfwDestroyWindow(window);
+    
+    // Destroys all remaining windows, cursors and other allocated resources
+    glfwTerminate();
 }

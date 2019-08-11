@@ -1,10 +1,8 @@
 GLMFLAGS=`pkg-config --cflags --libs /usr/local/Cellar/glm/0.9.9.5/lib/pkgconfig/glm.pc`
-SDL2FLAGS=`pkg-config --cflags --libs /usr/local/Cellar/sdl2/2.0.9_1/lib/pkgconfig/sdl2.pc`
-OPENGL=-framework OpenGL
-ALLFLAGS=$(GLMFLAGS) $(SDL2FLAGS) $(OPENGL)
+VULKAN=-I/usr/local/Caskroom/vulkan-sdk/1.1.114.0/macOS/include -L/usr/local/Caskroom/vulkan-sdk/1.1.114.0/macOS/lib -lvulkan
+GLFW=`pkg-config --cflags --libs /usr/local/Cellar/glfw/3.3/lib/pkgconfig/glfw3.pc` 
+ALLFLAGS=$(GLMFLAGS) $(VULKAN) $(GLFW)
 
-main: Window.o main.cpp
-	g++ main.cpp -o main Window.o $(ALLFLAGS)
+main: main.cpp
+	g++ -std=c++11 main.cpp -o main $(ALLFLAGS)
 
-Window.o: Window.cpp Window.hpp
-	g++ -c Window.cpp $(ALLFLAGS)
